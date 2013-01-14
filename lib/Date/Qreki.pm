@@ -49,7 +49,7 @@ sub get_rokuyou
 	my ($year,$mon,$day) = @_;
 	my ($tm0,$q_year,$q_mon,$q_day,$uruu,$q_yaer);
 
-	($q_yaer,$uruu,$q_mon,$q_day) = &calc_kyureki($year,$mon,$day);
+	($q_yaer,$uruu,$q_mon,$q_day) = calc_kyureki($year,$mon,$day);
 
 	return(($q_mon + $q_day) % 6);
 }
@@ -74,14 +74,14 @@ sub calc_kyureki
 	my ($year,$mon,$day) = @_;
 	my (@kyureki,$tm,@saku,$lap,@a,$i,@m);
 
-	my $tm0 = &YMDT2JD($year,$mon,$day,0,0,0);
+	my $tm0 = YMDT2JD($year,$mon,$day,0,0,0);
 
 #-----------------------------------------------------------------------
 # 計算対象の直前にあたる二分二至の時刻を求める
 # chu[0,0]:二分二至の時刻  chu[0,1]:その時の太陽黄経
 #-----------------------------------------------------------------------
         my @chu;
-	($chu[0][0],$chu[0][1]) = &before_nibun($tm0);
+	($chu[0][0],$chu[0][1]) = before_nibun($tm0);
 
 #-----------------------------------------------------------------------
 # 中気の時刻を計算（４回計算する）
@@ -94,7 +94,7 @@ sub calc_kyureki
 #-----------------------------------------------------------------------
 #  計算対象の直前にあたる二分二至の直前の朔の時刻を求める
 #-----------------------------------------------------------------------
-	$saku[0] = &calc_saku($chu[0][0]);
+	$saku[0] = calc_saku($chu[0][0]);
 
 
 #-----------------------------------------------------------------------
@@ -103,12 +103,12 @@ sub calc_kyureki
 	for($i=1;$i<5;$i++){
 		$tm=$saku[$i-1];
 		$tm += 30.0;
-		$saku[$i]=&calc_saku($tm);
+		$saku[$i]=calc_saku($tm);
 
 # 前と同じ時刻を計算した場合（両者の差が26日以内）には、初期値を
 # +33日にして再実行させる。
 		if( abs( int($saku[$i-1])-int($saku[$i]) ) <= 26.0 ){
-			$saku[$i]=&calc_saku($saku[$i-1]+35.0);
+			$saku[$i]=calc_saku($saku[$i-1]+35.0);
 		}
 	}
 
@@ -122,7 +122,7 @@ sub calc_kyureki
 		for($i=0;$i<5;$i++){
 			$saku[$i]=$saku[$i+1];
 		}
-		$saku[4] = &calc_saku($saku[3]+35.0);
+		$saku[4] = calc_saku($saku[3]+35.0);
 	}
 
 #-----------------------------------------------------------------------
@@ -135,7 +135,7 @@ sub calc_kyureki
 		for($i=4;$i>0;$i--){
 			$saku[$i] = $saku[$i-1];
 		}
-		$saku[0] = &calc_saku($saku[0]-27.0);
+		$saku[0] = calc_saku($saku[0]-27.0);
 	}
 
 #-----------------------------------------------------------------------
@@ -206,7 +206,7 @@ sub calc_kyureki
 #   まだ年を越していないはず...）
 #-----------------------------------------------------------------------
 
-	@a = &JD2YMDT($tm0);
+	@a = JD2YMDT($tm0);
 	$kyureki[0] = $a[0];
 	if($kyureki[2] > 9 && $kyureki[2] > $a[1]){
 		$kyureki[0]--;
@@ -247,7 +247,7 @@ sub calc_chu
 #-----------------------------------------------------------------------
 	$t=($tm2+0.5) / 36525.0;
 	$t=$t + ($tm1-2451545.0) / 36525.0;
-	$rm_sun = &LONGITUDE_SUN( $t );
+	$rm_sun = LONGITUDE_SUN( $t );
 
 	$rm_sun0 = 30.0*int($rm_sun/30.0);
 
@@ -263,7 +263,7 @@ sub calc_chu
 #-----------------------------------------------------------------------
 		$t =($tm2+0.5) / 36525.0;
 		$t =$t + ($tm1-2451545.0) / 36525.0;
-		$rm_sun=&LONGITUDE_SUN( $t );
+		$rm_sun=LONGITUDE_SUN( $t );
 
 #-----------------------------------------------------------------------
 # 黄経差 Δλ＝λsun −λsun0
@@ -341,7 +341,7 @@ sub before_nibun
 #-----------------------------------------------------------------------
 	$t=($tm2+0.5) / 36525.0;
 	$t=$t + ($tm1-2451545.0) / 36525.0;
-	$rm_sun=&LONGITUDE_SUN( $t );
+	$rm_sun=LONGITUDE_SUN( $t );
 	$rm_sun0=90*int($rm_sun/90.0);
 
 #-----------------------------------------------------------------------
@@ -356,7 +356,7 @@ sub before_nibun
 #-----------------------------------------------------------------------
 		$t=($tm2+0.5) / 36525.0;
 		$t=$t + ($tm1-2451545.0) / 36525.0;
-		$rm_sun=&LONGITUDE_SUN( $t );
+		$rm_sun=LONGITUDE_SUN( $t );
 
 #-----------------------------------------------------------------------
 # 黄経差 Δλ＝λsun −λsun0
@@ -451,8 +451,8 @@ sub calc_saku
 #-----------------------------------------------------------------------
 		$t=($tm2+0.5) / 36525.0;
 		$t=$t + ($tm1-2451545.0) / 36525.0;
-		$rm_sun=&LONGITUDE_SUN( $t );
-		$rm_moon=&LONGITUDE_MOON( $t );
+		$rm_sun=LONGITUDE_SUN( $t );
+		$rm_moon=LONGITUDE_MOON( $t );
 
 #-----------------------------------------------------------------------
 # 月と太陽の黄経差Δλ
@@ -465,21 +465,21 @@ sub calc_saku
 # 入るように補正する
 #-----------------------------------------------------------------------
 		if( $lc==1 && $delta_rm < 0.0 ){
-			$delta_rm = &NORMALIZATION_ANGLE( $delta_rm );
+			$delta_rm = NORMALIZATION_ANGLE( $delta_rm );
 		}
 #-----------------------------------------------------------------------
 #   春分の近くで朔がある場合（0 ≦λsun≦ 20）で、月の黄経λmoon≧300 の
 #   場合には、Δλ＝ 360.0 − Δλ と計算して補正する
 #-----------------------------------------------------------------------
 		elsif( $rm_sun >= 0 && $rm_sun <= 20 && $rm_moon >= 300 ){
-			$delta_rm = &NORMALIZATION_ANGLE( $delta_rm );
+			$delta_rm = NORMALIZATION_ANGLE( $delta_rm );
 			$delta_rm = 360.0 - $delta_rm;
 		}
 #-----------------------------------------------------------------------
 # Δλの引き込み範囲（±40°）を逸脱した場合には、補正を行う
 #-----------------------------------------------------------------------
 		elsif( abs( $delta_rm ) > 40.0 ) {
-			$delta_rm = &NORMALIZATION_ANGLE( $delta_rm );
+			$delta_rm = NORMALIZATION_ANGLE( $delta_rm );
 		}
 
 #-----------------------------------------------------------------------
@@ -558,44 +558,44 @@ sub LONGITUDE_SUN
 #-----------------------------------------------------------------------
 # 摂動項の計算
 #-----------------------------------------------------------------------
-	$ang = &NORMALIZATION_ANGLE(  31557.0 * $t + 161.0 );
+	$ang = NORMALIZATION_ANGLE(  31557.0 * $t + 161.0 );
 	$th =       .0004 * deg_cos( $ang );
-	$ang = &NORMALIZATION_ANGLE(  29930.0 * $t +  48.0 );
+	$ang = NORMALIZATION_ANGLE(  29930.0 * $t +  48.0 );
 	$th = $th +  .0004 * deg_cos ($ang );
-	$ang = &NORMALIZATION_ANGLE(   2281.0 * $t + 221.0 );
+	$ang = NORMALIZATION_ANGLE(   2281.0 * $t + 221.0 );
 	$th = $th +  .0005 * deg_cos ($ang );
-	$ang = &NORMALIZATION_ANGLE(    155.0 * $t + 118.0 );
+	$ang = NORMALIZATION_ANGLE(    155.0 * $t + 118.0 );
 	$th = $th +  .0005 * deg_cos ($ang );
-	$ang = &NORMALIZATION_ANGLE(  33718.0 * $t + 316.0 );
+	$ang = NORMALIZATION_ANGLE(  33718.0 * $t + 316.0 );
 	$th = $th +  .0006 * deg_cos ($ang );
-	$ang = &NORMALIZATION_ANGLE(   9038.0 * $t +  64.0 );
+	$ang = NORMALIZATION_ANGLE(   9038.0 * $t +  64.0 );
 	$th = $th +  .0007 * deg_cos ($ang );
-	$ang = &NORMALIZATION_ANGLE(   3035.0 * $t + 110.0 );
+	$ang = NORMALIZATION_ANGLE(   3035.0 * $t + 110.0 );
 	$th = $th +  .0007 * deg_cos ($ang );
-	$ang = &NORMALIZATION_ANGLE(  65929.0 * $t +  45.0 );
+	$ang = NORMALIZATION_ANGLE(  65929.0 * $t +  45.0 );
 	$th = $th +  .0007 * deg_cos ($ang );
-	$ang = &NORMALIZATION_ANGLE(  22519.0 * $t + 352.0 );
+	$ang = NORMALIZATION_ANGLE(  22519.0 * $t + 352.0 );
 	$th = $th +  .0013 * deg_cos ($ang );
-	$ang = &NORMALIZATION_ANGLE(  45038.0 * $t + 254.0 );
+	$ang = NORMALIZATION_ANGLE(  45038.0 * $t + 254.0 );
 	$th = $th +  .0015 * deg_cos ($ang );
-	$ang = &NORMALIZATION_ANGLE( 445267.0 * $t + 208.0 );
+	$ang = NORMALIZATION_ANGLE( 445267.0 * $t + 208.0 );
 	$th = $th +  .0018 * deg_cos ($ang );
-	$ang = &NORMALIZATION_ANGLE(     19.0 * $t + 159.0 );
+	$ang = NORMALIZATION_ANGLE(     19.0 * $t + 159.0 );
 	$th = $th +  .0018 * deg_cos ($ang );
-	$ang = &NORMALIZATION_ANGLE(  32964.0 * $t + 158.0 );
+	$ang = NORMALIZATION_ANGLE(  32964.0 * $t + 158.0 );
 	$th = $th +  .0020 * deg_cos ($ang );
-	$ang = &NORMALIZATION_ANGLE(  71998.1 * $t + 265.1 );
+	$ang = NORMALIZATION_ANGLE(  71998.1 * $t + 265.1 );
 	$th = $th +  .0200 * deg_cos ($ang );
-	$ang = &NORMALIZATION_ANGLE(  35999.05 * $t + 267.52 );
+	$ang = NORMALIZATION_ANGLE(  35999.05 * $t + 267.52 );
 	$th = $th - 0.0048 * $t * deg_cos ($ang ) ;
 	$th = $th + 1.9147     * deg_cos ($ang ) ;
 
 #-----------------------------------------------------------------------
 # 比例項の計算
 #-----------------------------------------------------------------------
-	$ang = &NORMALIZATION_ANGLE( 36000.7695 * $t );
-	$ang = &NORMALIZATION_ANGLE( $ang + 280.4659 );
-	$th  = &NORMALIZATION_ANGLE( $th + $ang );
+	$ang = NORMALIZATION_ANGLE( 36000.7695 * $t );
+	$ang = NORMALIZATION_ANGLE( $ang + 280.4659 );
+	$th  = NORMALIZATION_ANGLE( $th + $ang );
 
 	return($th);
 }
@@ -611,135 +611,135 @@ sub LONGITUDE_MOON
 #-----------------------------------------------------------------------
 # 摂動項の計算
 #-----------------------------------------------------------------------
-  $ang = &NORMALIZATION_ANGLE( 2322131.0  * $t + 191.0  );
+  $ang = NORMALIZATION_ANGLE( 2322131.0  * $t + 191.0  );
    $th =      .0003 * deg_cos ($ang );
-  $ang = &NORMALIZATION_ANGLE(    4067.0  * $t +  70.0  );
+  $ang = NORMALIZATION_ANGLE(    4067.0  * $t +  70.0  );
    $th = $th + .0003 * deg_cos ($ang );
-  $ang = &NORMALIZATION_ANGLE(  549197.0  * $t + 220.0  );
+  $ang = NORMALIZATION_ANGLE(  549197.0  * $t + 220.0  );
    $th = $th + .0003 * deg_cos ($ang );
-  $ang = &NORMALIZATION_ANGLE( 1808933.0  * $t +  58.0  );
+  $ang = NORMALIZATION_ANGLE( 1808933.0  * $t +  58.0  );
    $th = $th + .0003 * deg_cos ($ang );
-  $ang = &NORMALIZATION_ANGLE(  349472.0  * $t + 337.0  );
+  $ang = NORMALIZATION_ANGLE(  349472.0  * $t + 337.0  );
    $th = $th + .0003 * deg_cos ($ang );
-  $ang = &NORMALIZATION_ANGLE(  381404.0  * $t + 354.0  );
+  $ang = NORMALIZATION_ANGLE(  381404.0  * $t + 354.0  );
    $th = $th + .0003 * deg_cos ($ang );
-  $ang = &NORMALIZATION_ANGLE(  958465.0  * $t + 340.0  );
+  $ang = NORMALIZATION_ANGLE(  958465.0  * $t + 340.0  );
    $th = $th + .0003 * deg_cos ($ang );
-  $ang = &NORMALIZATION_ANGLE(   12006.0  * $t + 187.0  );
+  $ang = NORMALIZATION_ANGLE(   12006.0  * $t + 187.0  );
    $th = $th + .0004 * deg_cos ($ang );
-  $ang = &NORMALIZATION_ANGLE(   39871.0  * $t + 223.0  );
+  $ang = NORMALIZATION_ANGLE(   39871.0  * $t + 223.0  );
    $th = $th + .0004 * deg_cos ($ang );
-  $ang = &NORMALIZATION_ANGLE(  509131.0  * $t + 242.0  );
+  $ang = NORMALIZATION_ANGLE(  509131.0  * $t + 242.0  );
    $th = $th + .0005 * deg_cos ($ang );
-  $ang = &NORMALIZATION_ANGLE( 1745069.0  * $t +  24.0  );
+  $ang = NORMALIZATION_ANGLE( 1745069.0  * $t +  24.0  );
    $th = $th + .0005 * deg_cos ($ang );
-  $ang = &NORMALIZATION_ANGLE( 1908795.0  * $t +  90.0  );
+  $ang = NORMALIZATION_ANGLE( 1908795.0  * $t +  90.0  );
    $th = $th + .0005 * deg_cos ($ang );
-  $ang = &NORMALIZATION_ANGLE( 2258267.0  * $t + 156.0  );
+  $ang = NORMALIZATION_ANGLE( 2258267.0  * $t + 156.0  );
    $th = $th + .0006 * deg_cos ($ang );
-  $ang = &NORMALIZATION_ANGLE(  111869.0  * $t +  38.0  );
+  $ang = NORMALIZATION_ANGLE(  111869.0  * $t +  38.0  );
    $th = $th + .0006 * deg_cos ($ang );
-  $ang = &NORMALIZATION_ANGLE(   27864.0  * $t + 127.0  );
+  $ang = NORMALIZATION_ANGLE(   27864.0  * $t + 127.0  );
    $th = $th + .0007 * deg_cos ($ang );
-  $ang = &NORMALIZATION_ANGLE(  485333.0  * $t + 186.0  );
+  $ang = NORMALIZATION_ANGLE(  485333.0  * $t + 186.0  );
    $th = $th + .0007 * deg_cos ($ang );
-  $ang = &NORMALIZATION_ANGLE(  405201.0  * $t +  50.0  );
+  $ang = NORMALIZATION_ANGLE(  405201.0  * $t +  50.0  );
    $th = $th + .0007 * deg_cos ($ang );
-  $ang = &NORMALIZATION_ANGLE(  790672.0  * $t + 114.0  );
+  $ang = NORMALIZATION_ANGLE(  790672.0  * $t + 114.0  );
    $th = $th + .0007 * deg_cos ($ang );
-  $ang = &NORMALIZATION_ANGLE( 1403732.0  * $t +  98.0  );
+  $ang = NORMALIZATION_ANGLE( 1403732.0  * $t +  98.0  );
    $th = $th + .0008 * deg_cos ($ang );
-  $ang = &NORMALIZATION_ANGLE(  858602.0  * $t + 129.0  );
+  $ang = NORMALIZATION_ANGLE(  858602.0  * $t + 129.0  );
    $th = $th + .0009 * deg_cos ($ang );
-  $ang = &NORMALIZATION_ANGLE( 1920802.0  * $t + 186.0  );
+  $ang = NORMALIZATION_ANGLE( 1920802.0  * $t + 186.0  );
    $th = $th + .0011 * deg_cos ($ang );
-  $ang = &NORMALIZATION_ANGLE( 1267871.0  * $t + 249.0  );
+  $ang = NORMALIZATION_ANGLE( 1267871.0  * $t + 249.0  );
    $th = $th + .0012 * deg_cos ($ang );
-  $ang = &NORMALIZATION_ANGLE( 1856938.0  * $t + 152.0  );
+  $ang = NORMALIZATION_ANGLE( 1856938.0  * $t + 152.0  );
    $th = $th + .0016 * deg_cos ($ang );
-  $ang = &NORMALIZATION_ANGLE(  401329.0  * $t + 274.0  );
+  $ang = NORMALIZATION_ANGLE(  401329.0  * $t + 274.0  );
    $th = $th + .0018 * deg_cos ($ang );
-  $ang = &NORMALIZATION_ANGLE(  341337.0  * $t +  16.0  );
+  $ang = NORMALIZATION_ANGLE(  341337.0  * $t +  16.0  );
    $th = $th + .0021 * deg_cos ($ang );
-  $ang = &NORMALIZATION_ANGLE(   71998.0  * $t +  85.0  );
+  $ang = NORMALIZATION_ANGLE(   71998.0  * $t +  85.0  );
    $th = $th + .0021 * deg_cos ($ang );
-  $ang = &NORMALIZATION_ANGLE(  990397.0  * $t + 357.0  );
+  $ang = NORMALIZATION_ANGLE(  990397.0  * $t + 357.0  );
    $th = $th + .0021 * deg_cos ($ang );
-  $ang = &NORMALIZATION_ANGLE(  818536.0  * $t + 151.0  );
+  $ang = NORMALIZATION_ANGLE(  818536.0  * $t + 151.0  );
    $th = $th + .0022 * deg_cos ($ang );
-  $ang = &NORMALIZATION_ANGLE(  922466.0  * $t + 163.0  );
+  $ang = NORMALIZATION_ANGLE(  922466.0  * $t + 163.0  );
    $th = $th + .0023 * deg_cos ($ang );
-  $ang = &NORMALIZATION_ANGLE(   99863.0  * $t + 122.0  );
+  $ang = NORMALIZATION_ANGLE(   99863.0  * $t + 122.0  );
    $th = $th + .0024 * deg_cos ($ang );
-  $ang = &NORMALIZATION_ANGLE( 1379739.0  * $t +  17.0  );
+  $ang = NORMALIZATION_ANGLE( 1379739.0  * $t +  17.0  );
    $th = $th + .0026 * deg_cos ($ang );
-  $ang = &NORMALIZATION_ANGLE(  918399.0  * $t + 182.0  );
+  $ang = NORMALIZATION_ANGLE(  918399.0  * $t + 182.0  );
    $th = $th + .0027 * deg_cos ($ang );
-  $ang = &NORMALIZATION_ANGLE(    1934.0  * $t + 145.0  );
+  $ang = NORMALIZATION_ANGLE(    1934.0  * $t + 145.0  );
    $th = $th + .0028 * deg_cos ($ang );
-  $ang = &NORMALIZATION_ANGLE(  541062.0  * $t + 259.0  );
+  $ang = NORMALIZATION_ANGLE(  541062.0  * $t + 259.0  );
    $th = $th + .0037 * deg_cos ($ang );
-  $ang = &NORMALIZATION_ANGLE( 1781068.0  * $t +  21.0  );
+  $ang = NORMALIZATION_ANGLE( 1781068.0  * $t +  21.0  );
    $th = $th + .0038 * deg_cos ($ang );
-  $ang = &NORMALIZATION_ANGLE(     133.0  * $t +  29.0  );
+  $ang = NORMALIZATION_ANGLE(     133.0  * $t +  29.0  );
    $th = $th + .0040 * deg_cos ($ang );
-  $ang = &NORMALIZATION_ANGLE( 1844932.0  * $t +  56.0  );
+  $ang = NORMALIZATION_ANGLE( 1844932.0  * $t +  56.0  );
    $th = $th + .0040 * deg_cos ($ang );
-  $ang = &NORMALIZATION_ANGLE( 1331734.0  * $t + 283.0  );
+  $ang = NORMALIZATION_ANGLE( 1331734.0  * $t + 283.0  );
    $th = $th + .0040 * deg_cos ($ang );
-  $ang = &NORMALIZATION_ANGLE(  481266.0  * $t + 205.0  );
+  $ang = NORMALIZATION_ANGLE(  481266.0  * $t + 205.0  );
    $th = $th + .0050 * deg_cos ($ang );
-  $ang = &NORMALIZATION_ANGLE(   31932.0  * $t + 107.0  );
+  $ang = NORMALIZATION_ANGLE(   31932.0  * $t + 107.0  );
    $th = $th + .0052 * deg_cos ($ang );
-  $ang = &NORMALIZATION_ANGLE(  926533.0  * $t + 323.0  );
+  $ang = NORMALIZATION_ANGLE(  926533.0  * $t + 323.0  );
    $th = $th + .0068 * deg_cos ($ang );
-  $ang = &NORMALIZATION_ANGLE(  449334.0  * $t + 188.0  );
+  $ang = NORMALIZATION_ANGLE(  449334.0  * $t + 188.0  );
    $th = $th + .0079 * deg_cos ($ang );
-  $ang = &NORMALIZATION_ANGLE(  826671.0  * $t + 111.0  );
+  $ang = NORMALIZATION_ANGLE(  826671.0  * $t + 111.0  );
    $th = $th + .0085 * deg_cos ($ang );
-  $ang = &NORMALIZATION_ANGLE( 1431597.0  * $t + 315.0  );
+  $ang = NORMALIZATION_ANGLE( 1431597.0  * $t + 315.0  );
    $th = $th + .0100 * deg_cos ($ang );
-  $ang = &NORMALIZATION_ANGLE( 1303870.0  * $t + 246.0  );
+  $ang = NORMALIZATION_ANGLE( 1303870.0  * $t + 246.0  );
    $th = $th + .0107 * deg_cos ($ang );
-  $ang = &NORMALIZATION_ANGLE(  489205.0  * $t + 142.0  );
+  $ang = NORMALIZATION_ANGLE(  489205.0  * $t + 142.0  );
    $th = $th + .0110 * deg_cos ($ang );
-  $ang = &NORMALIZATION_ANGLE( 1443603.0  * $t +  52.0  );
+  $ang = NORMALIZATION_ANGLE( 1443603.0  * $t +  52.0  );
    $th = $th + .0125 * deg_cos ($ang );
-  $ang = &NORMALIZATION_ANGLE(   75870.0  * $t +  41.0  );
+  $ang = NORMALIZATION_ANGLE(   75870.0  * $t +  41.0  );
    $th = $th + .0154 * deg_cos ($ang );
-  $ang = &NORMALIZATION_ANGLE(  513197.9  * $t + 222.5  );
+  $ang = NORMALIZATION_ANGLE(  513197.9  * $t + 222.5  );
    $th = $th + .0304 * deg_cos ($ang );
-  $ang = &NORMALIZATION_ANGLE(  445267.1  * $t +  27.9  );
+  $ang = NORMALIZATION_ANGLE(  445267.1  * $t +  27.9  );
    $th = $th + .0347 * deg_cos ($ang );
-  $ang = &NORMALIZATION_ANGLE(  441199.8  * $t +  47.4  );
+  $ang = NORMALIZATION_ANGLE(  441199.8  * $t +  47.4  );
    $th = $th + .0409 * deg_cos ($ang );
-  $ang = &NORMALIZATION_ANGLE(  854535.2  * $t + 148.2  );
+  $ang = NORMALIZATION_ANGLE(  854535.2  * $t + 148.2  );
    $th = $th + .0458 * deg_cos ($ang );
-  $ang = &NORMALIZATION_ANGLE( 1367733.1  * $t + 280.7  );
+  $ang = NORMALIZATION_ANGLE( 1367733.1  * $t + 280.7  );
    $th = $th + .0533 * deg_cos ($ang );
-  $ang = &NORMALIZATION_ANGLE(  377336.3  * $t +  13.2  );
+  $ang = NORMALIZATION_ANGLE(  377336.3  * $t +  13.2  );
    $th = $th + .0571 * deg_cos ($ang );
-  $ang = &NORMALIZATION_ANGLE(   63863.5  * $t + 124.2  );
+  $ang = NORMALIZATION_ANGLE(   63863.5  * $t + 124.2  );
    $th = $th + .0588 * deg_cos ($ang );
-  $ang = &NORMALIZATION_ANGLE(  966404.0  * $t + 276.5  );
+  $ang = NORMALIZATION_ANGLE(  966404.0  * $t + 276.5  );
    $th = $th + .1144 * deg_cos ($ang );
-  $ang = &NORMALIZATION_ANGLE(   35999.05 * $t +  87.53 );
+  $ang = NORMALIZATION_ANGLE(   35999.05 * $t +  87.53 );
    $th = $th + .1851 * deg_cos ($ang );
-  $ang = &NORMALIZATION_ANGLE(  954397.74 * $t + 179.93 );
+  $ang = NORMALIZATION_ANGLE(  954397.74 * $t + 179.93 );
    $th = $th + .2136 * deg_cos ($ang );
-  $ang = &NORMALIZATION_ANGLE(  890534.22 * $t + 145.7  );
+  $ang = NORMALIZATION_ANGLE(  890534.22 * $t + 145.7  );
    $th = $th + .6583 * deg_cos ($ang );
-  $ang = &NORMALIZATION_ANGLE(  413335.35 * $t +  10.74 );
+  $ang = NORMALIZATION_ANGLE(  413335.35 * $t +  10.74 );
    $th = $th + 1.2740 * deg_cos ($ang );
-  $ang = &NORMALIZATION_ANGLE( 477198.868 * $t + 44.963 ); 
+  $ang = NORMALIZATION_ANGLE( 477198.868 * $t + 44.963 ); 
    $th = $th + 6.2888 * deg_cos ($ang );
 
 #-----------------------------------------------------------------------
 # 比例項の計算
 #-----------------------------------------------------------------------
-  $ang = &NORMALIZATION_ANGLE(  481267.8809 * $t );
-  $ang = &NORMALIZATION_ANGLE(  $ang + 218.3162 );
-  $th  = &NORMALIZATION_ANGLE(  $th  +  $ang );
+  $ang = NORMALIZATION_ANGLE(  481267.8809 * $t );
+  $ang = NORMALIZATION_ANGLE(  $ang + 218.3162 );
+  $th  = NORMALIZATION_ANGLE(  $th  +  $ang );
 
   return($th);
 }
@@ -844,7 +844,7 @@ sub check_24sekki
 	my (@sekki24) = ("春分","清明","穀雨","立夏","小満","芒種","夏至","小暑","大暑","立秋","処暑","白露",
 	                   "秋分","寒露","霜降","立冬","小雪","大雪","冬至","小寒","大寒","立春","雨水","啓蟄");
 
-	my $tm = &YMDT2JD($year,$mon,$day,0,0,0);
+	my $tm = YMDT2JD($year,$mon,$day,0,0,0);
 
 #-----------------------------------------------------------------------
 #時刻引数を分解する
@@ -856,7 +856,7 @@ sub check_24sekki
 	$t=$t + ($tm1-2451545.0) / 36525.0;
 
 	#今日の太陽の黄経
-	$rm_sun_today = &LONGITUDE_SUN( $t );
+	$rm_sun_today = LONGITUDE_SUN( $t );
 
 	$tm++;
 	$tm1 = int($tm);
@@ -866,7 +866,7 @@ sub check_24sekki
 	$t=$t + ($tm1-2451545.0) / 36525.0;
 
 	#明日の太陽の黄経
-	$rm_sun_tommorow = &LONGITUDE_SUN($t);
+	$rm_sun_tommorow = LONGITUDE_SUN($t);
 
 	#
 	$rm_sun_today0   = 15.0 * int($rm_sun_today / 15.0);
