@@ -6,12 +6,11 @@ Date::Qreki
 package Date::Qreki;
 require Exporter;
 @ISA = qw(Exporter);
-@EXPORT_OK = qw//;
-use warnings;
-use strict;
+@EXPORT_OK = qw/calc_kyureki get_rokuyou/;
+#use warnings;
+#use strict;
 our $VERSION = 0.01;
 
-package qreki;
 #=========================================================================
 # 旧暦計算サンプルプログラム  $Revision:   1.1  $
 # Coded by H.Takano 1993,1994
