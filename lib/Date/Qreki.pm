@@ -1,8 +1,25 @@
 =head1 NAME
 
-Date::Qreki - convert Gregorian to Japanese dates.
+Date::Qreki - convert Gregorian to Japanese "kyureki" dates.
+
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION
+
+=head1 FUNCTIONS
+
+=head2 calc_kyureki
+
+=head2 get_rokuyou
+
+=head1 SEE ALSO
+
+=head1 COPYRIGHT AND LICENSE
+
+=head1 AUTHOR
 
 =cut
+
 package Date::Qreki;
 require Exporter;
 @ISA = qw(Exporter);
@@ -878,8 +895,5 @@ sub check_24sekki
 		return('');
 	}
 }
-
-
-
 
 1;
