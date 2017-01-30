@@ -1,2 +1,5 @@
 # Generated from Makefile.PL
 Makefile
+README
+examples/*-out.txt
+lib/Date/Qreki.pod

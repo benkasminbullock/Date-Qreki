@@ -1,0 +1,140 @@
+=encoding UTF-8
+
+=head1 NAME
+
+Date::Qreki - convert Gregorian to Japanese "kyureki" dates.
+
+=head1 VERSION
+
+This documents [% info.colon %] version [% info.version %]
+corresponding to git commit L<[% commit.commit %]|[% info.repo
+%]/commit/[% commit.commit %]> released on [% commit.date %].
+
+=head1 DESCRIPTION
+
+This module's documentation is currently a copy of the Japanese
+documentation in the original script.
+
+=head1 FUNCTIONS
+
+=head2 calc_kyureki
+
+	@kyureki = calc_kyureki ($year,$mon,$day);
+
+新暦に対応する、旧暦を求める。
+
+呼び出し時にセットする変数
+引　数　year : 計算する日付
+        mon
+        day
+
+戻り値　kyureki : 答えの格納先（配列に答えをかえす）
+        　　  kyureki[0] : 旧暦年
+        　　  kyureki[1] : 平月／閏月 flag .... 平月:0 閏月:1
+        　　  kyureki[2] : 旧暦月
+        　　  kyureki[3] : 旧暦日
+
+=head2 get_rokuyou
+
+	$rokuyou = get_rokuyou ($year,$mon,$day);
+
+六曜算出関数
+
+引数：新暦年月日
+戻値：0:大安 1:赤口 2:先勝 3:友引 4:先負 5:仏滅
+
+=head1 COPYRIGHT
+
+Date::Qreki is copyright H. Takano, N. Ueno.
+
+=head1 LICENSE
+
+The original licence in Japanese reads as follows:
+
+19.  配布規定について
+
+    本当は、「一般常識の許す範囲で...」としたい所ですが、世の中には色々な人
+  がいますので、ある程度の枠組みが必要なのは仕方の無いことなのでしょう。 と
+  もあれ拙者が希望するのは以下のようなものです。
+
+     i   本スクリプト・説明書を再配布する場合はオリジナルのアーカイブファイ
+       ルに含まれるファイルを全て含み、オリジナルのスクリプト・説明書を改変
+       しないで下さい。 また、 頒布の都合でアーカイブ形式（.arc  .zip  .zoo
+       等）を変更する場合も同様に扱って下さい。
+
+    ii   再配布する際の媒体に要するコストを除いて一切の金銭等の授受は禁止い
+       たします。    （他の言語に移植したものを配布する場合にも適用いたしま
+       す。）
+
+   iii   他の言語に移植したり、  本スクリプトの一部または全部を引用して作成
+       し、これを配布する場合には、オリジナルのスクリプトと本説明書を必ず同
+       梱して下さい。
+       その場合の著作権につきましては、引用した部分のみ著者に帰属し、その外
+       は製作者に帰属します。
+
+    iv   配布によって著作者が一切の制限を受ける可能性がないようにして下さ
+       い。
+
+  なお、 いづれの場合におきましても、承諾・転載の報告など一切不要といたしま
+  す。
+
+Translation:
+
+19 Conditions for redistribution
+
+I would prefer to release this under the conditions of "whatever
+normal common sense allows", but since there are a variety of people
+in the world, unfortunately I think some form of framework is
+necessary. My wishes are as follows
+
+i. If this script is redistributed, please also include all the
+original scripts, and do not modify the original script and its
+documentation. This also applies if the archive format (.arc, .zip,
+.zoo, etc.) is changed.
+
+ii. I forbid any resale of this program beyond the cost of
+distribution media. (This also applies if the program is translated to
+a different programming language).
+
+iii. If this is translated to a different programming language, or if
+part or all of this script is used as part of another program, please
+be sure to include the original script and this explanation with
+it. If part of this program is used, I retain the copyright of the
+quoted material only and the remaining program remains copyrighted by
+its author.
+
+iv. Please do not allow the author of this software to be placed under
+any restrictions by your redistribution.
+
+In any case, there is absolutely no need to obtain the author's
+consent or notify the author.
+
+End of artistic translation.
+
+[% MACRO original(file) BLOCK -%]
+L<F<[% file %]>|https://api.metacpan.org/source/BKB/[% info.name %]-[% info.version %]/originals/[% file %]> in the distribution.)
+[%- END %]
+
+The original Awk script [% original("qreki.awk") %] and its
+documentation [% original("qreki.doc") %] (are in F<originals> in the
+distribution.
+
+qreki.doc is a text file in Shift-JIS format. To read it on a modern
+terminal, use something like
+
+    iconv -f CP932 -t UTF-8  originals/qreki.doc
+
+or
+
+    perl -MEncode -n -e "print encode_utf8 (decode ('CP932', \$_));" < originals/qreki.doc
+
+=head1 AUTHOR
+
+Original Awk script by H. Takano. Perl conversion by N. Ueno. This
+CPAN-ification of N. Ueno's Perl script was performed by Ben Bullock.
+
+For enquiries about this Perl module, please contact Ben Bullock
+<bkb@cpan.org>.
+
+=cut
+

@@ -3,5 +3,6 @@ use warnings;
 use strict;
 use Perl::Build;
 perl_build (
+    make_pod => './make-pod.pl',
 );
 exit;
