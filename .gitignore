@@ -3,3 +3,6 @@ Makefile
 README
 examples/*-out.txt
 lib/Date/Qreki.pod
+lib/Date/Qreki-ja.pod
+Date-Qreki-*
+MANIFEST

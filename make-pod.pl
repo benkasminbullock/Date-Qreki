@@ -31,8 +31,11 @@ my $info = get_info ();
 $vars{info} = $info;
 $vars{commit} = get_commit ();
 my $pod = $info->{pod};
+my $jpod = $pod;
+$jpod =~ s/\.pod$/-ja.pod/;
 chmod 0644, $pod;
 $tt->process ("$pod.tmpl", \%vars, $pod) or die '' . $tt->error ();
+$tt->process ("$jpod.tmpl", \%vars, $jpod) or die '' . $tt->error ();
 chmod 0444, $pod;
 exit;
 

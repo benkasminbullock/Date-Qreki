@@ -1,3 +1,6 @@
+[%- MACRO since(version) BLOCK -%]
+This function was added in version [% version %] of the module.
+[%- END -%]
 =encoding UTF-8
 
 =head1 NAME
@@ -12,36 +15,60 @@ corresponding to git commit L<[% commit.commit %]|[% info.repo
 
 =head1 DESCRIPTION
 
-This module's documentation is currently a copy of the Japanese
-documentation in the original script.
+Convert Western dates to old Japanese lunar calendar dates.
 
 =head1 FUNCTIONS
 
 =head2 calc_kyureki
 
-	@kyureki = calc_kyureki ($year,$mon,$day);
+	@kyureki = calc_kyureki ($year, $mon, $day);
 
-新暦に対応する、旧暦を求める。
+Given a western date, return the corresponding old Japanese calendar
+date. The return value is an array containing the following fields.
 
-呼び出し時にセットする変数
-引　数　year : 計算する日付
-        mon
-        day
+=over
 
-戻り値　kyureki : 答えの格納先（配列に答えをかえす）
-        　　  kyureki[0] : 旧暦年
-        　　  kyureki[1] : 平月／閏月 flag .... 平月:0 閏月:1
-        　　  kyureki[2] : 旧暦月
-        　　  kyureki[3] : 旧暦日
+=item kyureki[0] - the corresponding year
+
+=item kyureki[1] - if the month is a leap month (intercalary month)
+
+See L<the Wikipedia article on
+Intercalation|https://en.wikipedia.org/wiki/Intercalation_(timekeeping)>
+for an explanation.
+
+=item kyureki[2] - the corresponding lunar month
+
+=item kyureki[3] - the corresponding day of the lunar month
 
 =head2 get_rokuyou
 
 	$rokuyou = get_rokuyou ($year,$mon,$day);
 
-六曜算出関数
+Get Japanese fortune telling day. Response is from 0 to 5
+corresponding to kanji names 0:大安 1:赤口 2:先勝 3:友引 4:先負 5:仏滅.
+See also L</rokuyou_unicode> for a version which returns the kanji
+names of the days.
 
-引数：新暦年月日
-戻値：0:大安 1:赤口 2:先勝 3:友引 4:先負 5:仏滅
+=head2 rokuyou_unicode
+
+    my $rokuyou = rokuyou_unicode (2017, 1, 30);
+
+This returns the kanji form of the rokuyou, which are six Japanese
+fortune telling days. The three arguments are year, month, and day in
+the modern calendar. This just calls L</get_rokuyou> with the dates
+then returns a Unicode version of the date. See, for example,
+L<WWWJDIC|http://www.edrdg.org/cgi-bin/wwwjdic/wwwjdic?1C> for the
+meanings of each of these day names.
+
+[% since('0.07') %]
+
+=head2 check_24sekki
+
+    my $sekki = check_24sekki ($year, $month, $day);
+
+Returns the L<Solar term|https://en.wikipedia.org/wiki/Solar_term>
+corresponding to the date given. The response is in Japanese kanji in
+character (utf8) format.
 
 =head1 COPYRIGHT
 
@@ -49,36 +76,10 @@ Date::Qreki is copyright H. Takano, N. Ueno.
 
 =head1 LICENSE
 
-The original licence in Japanese reads as follows:
+For the original licence, see L<Date::Qreki-ja/配布規定>. The
+following is a translation of the licence.
 
-19.  配布規定について
-
-    本当は、「一般常識の許す範囲で...」としたい所ですが、世の中には色々な人
-  がいますので、ある程度の枠組みが必要なのは仕方の無いことなのでしょう。 と
-  もあれ拙者が希望するのは以下のようなものです。
-
-     i   本スクリプト・説明書を再配布する場合はオリジナルのアーカイブファイ
-       ルに含まれるファイルを全て含み、オリジナルのスクリプト・説明書を改変
-       しないで下さい。 また、 頒布の都合でアーカイブ形式（.arc  .zip  .zoo
-       等）を変更する場合も同様に扱って下さい。
-
-    ii   再配布する際の媒体に要するコストを除いて一切の金銭等の授受は禁止い
-       たします。    （他の言語に移植したものを配布する場合にも適用いたしま
-       す。）
-
-   iii   他の言語に移植したり、  本スクリプトの一部または全部を引用して作成
-       し、これを配布する場合には、オリジナルのスクリプトと本説明書を必ず同
-       梱して下さい。
-       その場合の著作権につきましては、引用した部分のみ著者に帰属し、その外
-       は製作者に帰属します。
-
-    iv   配布によって著作者が一切の制限を受ける可能性がないようにして下さ
-       い。
-
-  なお、 いづれの場合におきましても、承諾・転載の報告など一切不要といたしま
-  す。
-
-Translation:
+(Translation by B. Bullock)
 
 19 Conditions for redistribution
 
@@ -109,24 +110,28 @@ any restrictions by your redistribution.
 In any case, there is absolutely no need to obtain the author's
 consent or notify the author.
 
-End of artistic translation.
+=head2 Original files
 
 [% MACRO original(file) BLOCK -%]
-L<F<[% file %]>|https://api.metacpan.org/source/BKB/[% info.name %]-[% info.version %]/originals/[% file %]> in the distribution.)
+L<F<[% file %]>|https://api.metacpan.org/source/BKB/[% info.name %]-[% info.version %]/originals/[% file %]>
 [%- END %]
 
-The original Awk script [% original("qreki.awk") %] and its
-documentation [% original("qreki.doc") %] (are in F<originals> in the
-distribution.
-
-qreki.doc is a text file in Shift-JIS format. To read it on a modern
-terminal, use something like
+As required by the above licence, the original Awk script [%
+original("qreki.awk") %] and its documentation [%
+original("qreki.doc") %] are in the subdirectory F<originals> in the
+distribution. These are text files in
+L<Shift-JIS|http://www.sljfaq.org/afaq/encodings.html#encodings-Shift-JIS>
+format. To read them on a modern terminal, use something like
 
     iconv -f CP932 -t UTF-8  originals/qreki.doc
 
 or
 
     perl -MEncode -n -e "print encode_utf8 (decode ('CP932', \$_));" < originals/qreki.doc
+
+Web browsers also may or may not be able to render these
+files. Currently Google Chrome seems to be the only browser with
+Shift-JIS capabilities.
 
 =head1 AUTHOR
 
@@ -136,5 +141,4 @@ CPAN-ification of N. Ueno's Perl script was performed by Ben Bullock.
 For enquiries about this Perl module, please contact Ben Bullock
 <bkb@cpan.org>.
 
-=cut
 

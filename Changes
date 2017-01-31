@@ -1,8 +1,15 @@
 Revision history for perl module Date::Qreki
 
+0.07 2017-01-31
+
+* Documentation
+* Added Japanese documentation as separate document
+* Export check_24sekki
+
 0.06 2017-01-31
 
 * Documentation
+* Internals to Unicode
 
 0.05 2014-02-12
 
