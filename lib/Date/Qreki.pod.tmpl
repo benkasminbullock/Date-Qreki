@@ -15,7 +15,11 @@ corresponding to git commit L<[% commit.commit %]|[% info.repo
 
 =head1 DESCRIPTION
 
-Convert Western dates to old Japanese lunar calendar dates.
+This module contains functions related to the old Japanese lunar
+calendar.  Convert Western dates to old Japanese lunar calendar dates
+with L</calc_kyureki>. Get the fortune-telling day with
+L</get_rokuyou> or L</rokuyou_unicode>. Check if a date is a solar
+term with L</check_24sekki>.
 
 =head1 FUNCTIONS
 
@@ -39,6 +43,8 @@ for an explanation.
 =item kyureki[2] - the corresponding lunar month
 
 =item kyureki[3] - the corresponding day of the lunar month
+
+=back
 
 =head2 get_rokuyou
 
@@ -66,9 +72,41 @@ meanings of each of these day names.
 
     my $sekki = check_24sekki ($year, $month, $day);
 
-Returns the L<Solar term|https://en.wikipedia.org/wiki/Solar_term>
-corresponding to the date given. The response is in Japanese kanji in
-character (utf8) format.
+Is today a L<Solar term|https://en.wikipedia.org/wiki/Solar_term>?  If
+today is a solar term, it returns the Japanese name of the solar term
+corresponding to the date given. The response is in character (utf8)
+format.
+
+=head1 EXPORTS
+
+Nothing is exported by default. All of the functions can be exported
+using the tag ":all".
+
+    use Date::Qreki ':all';
+
+=head1 SEE ALSO
+
+=head2 Other CPAN modules
+
+=over
+
+=item L<Date::Japanese::Era>
+
+Japanese era-based dates.
+
+=item L<DateTime::Calendar::Japanese::Era>
+
+Older Japanese eras
+
+=item L<DateTime::Format::Japanese>
+
+=item L<DateTime::Calendar::Japanese>
+
+=item L<Lingua::JA::FindDates>
+
+Scan text to find dates in Japanese format.
+
+=back
 
 =head1 COPYRIGHT
 

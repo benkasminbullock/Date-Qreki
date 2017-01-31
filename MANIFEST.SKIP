@@ -8,4 +8,4 @@ MYMETA.*
 .*.bak
 ^examples/.*-out\.txt$
 ^make-pod\.pl$
-^lib/Date/Qreki\.pod\.tmpl$
+^lib/Date/Qreki.*\.pod\.tmpl$

@@ -76,7 +76,11 @@ Date::Qreki - 新旧暦変換
 
     my $sekki = check_24sekki ($year, $month, $day);
 
-L<二十四節気|https://ja.wikipedia.org/wiki/%E4%BA%8C%E5%8D%81%E5%9B%9B%E7%AF%80%E6%B0%97>を求める。
+今日がL<２４節気|https://ja.wikipedia.org/wiki/%E4%BA%8C%E5%8D%81%E5%9B%9B%E7%AF%80%E6%B0%97>かどうか調べる
+ 
+引数　 .... 計算対象となる年月日　$year $mon $day
+
+戻り値 .... ２４節気の名称または空のストリング（''）
 
 =head1 配布規定
 

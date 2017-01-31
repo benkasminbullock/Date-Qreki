@@ -12,7 +12,10 @@ binmode STDERR, ":encoding(utf8)";
 use Perl::Build 'get_info';
 use Perl::Build::Pod ':all';
 my $info = get_info (base => "$Bin/..");
-for my $filepath ("$Bin/../$info->{pod}"){
+my $pod = "$Bin/../$info->{pod}";
+my $jpod = $pod;
+$jpod =~ s/\.pod/-ja.pod/;
+for my $filepath ($pod, $jpod){
     my $errors = pod_checker ($filepath);
     ok (@$errors == 0, "No errors");
     my $linkerrors = pod_link_checker ($filepath);
