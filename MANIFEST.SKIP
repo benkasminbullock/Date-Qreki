@@ -9,3 +9,4 @@ MYMETA.*
 ^examples/.*-out\.txt$
 ^make-pod\.pl$
 ^lib/Date/Qreki.*\.pod\.tmpl$
+^xt/.*\.t$

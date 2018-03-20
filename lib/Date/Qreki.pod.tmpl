@@ -1,3 +1,14 @@
+[% MACRO example(file) BLOCK %]
+[%- pl =  file _ ".pl" -%]
+[%- out = file _ "-out.txt" -%]
+[% INCLUDE $pl | xtidy %]
+
+produces output
+
+[% INCLUDE $out | xtidy %]
+
+(This example is included as L<F<[% pl %]>|https://fastapi.metacpan.org/source/BKB/[% info.pm %]-[% info.version %]/examples/[% pl %]> in the distribution.)
+[% END %]
 [%- MACRO since(version) BLOCK -%]
 This function was added in version [% version %] of the module.
 [%- END -%]
@@ -5,7 +16,11 @@ This function was added in version [% version %] of the module.
 
 =head1 NAME
 
-Date::Qreki - convert Gregorian to Japanese "kyureki" dates.
+Date::Qreki - convert Gregorian dates to Japanese lunar calendar
+
+=head1 SYNOPSIS
+
+[% example("synopsis") %]
 
 =head1 VERSION
 
@@ -25,10 +40,12 @@ term with L</check_24sekki>.
 
 =head2 calc_kyureki
 
-	@kyureki = calc_kyureki ($year, $mon, $day);
+    @kyureki = calc_kyureki ($year, $mon, $day);
 
-Given a western date, return the corresponding old Japanese calendar
-date. The return value is an array containing the following fields.
+Given a western date, with January = 1, February = 2, etc., and the
+day of the month represented as a number from 1 to 31, return the
+corresponding old Japanese calendar date. The return value is an array
+containing the following fields.
 
 =over
 
@@ -50,10 +67,11 @@ for an explanation.
 
 	$rokuyou = get_rokuyou ($year,$mon,$day);
 
-Get Japanese fortune telling day. Response is from 0 to 5
-corresponding to kanji names 0:大安 1:赤口 2:先勝 3:友引 4:先負 5:仏滅.
-See also L</rokuyou_unicode> for a version which returns the kanji
-names of the days.
+Given a Western calendar date in the same format as L</calc_kyureki>,
+get the Japanese fortune telling day (rokuyou). The response is from 0
+to 5, corresponding to kanji names 0:大安 1:赤口 2:先勝 3:友引 4:先負
+5:仏滅.  See also L</rokuyou_unicode> for a version which returns the
+kanji names of the days.
 
 =head2 rokuyou_unicode
 
@@ -72,7 +90,7 @@ meanings of each of these day names.
 
     my $sekki = check_24sekki ($year, $month, $day);
 
-Is today a L<Solar term|https://en.wikipedia.org/wiki/Solar_term>?  If
+Is today a L<solar term|https://en.wikipedia.org/wiki/Solar_term>?  If
 today is a solar term, it returns the Japanese name of the solar term
 corresponding to the date given. The response is in character (utf8)
 format.
@@ -87,6 +105,8 @@ using the tag ":all".
 =head1 SEE ALSO
 
 =head2 Other CPAN modules
+
+Modules related to Japanese calendars include the following:
 
 =over
 
@@ -107,6 +127,23 @@ Older Japanese eras
 Scan text to find dates in Japanese format.
 
 =back
+
+Modules related to phases of the moon include
+
+=over
+
+=item L<Astro::MoonPhase>
+
+=item L<DateTime::Util::Astro::Moon>
+
+=item L<Weather::Com::Moon>
+
+=item L<Astro::Coord::ECI::Moon>
+
+=back
+
+As of [% info.version %], I have not tested any of these modules
+against Date::Qreki.
 
 =head1 COPYRIGHT
 
@@ -151,7 +188,7 @@ consent or notify the author.
 =head2 Original files
 
 [% MACRO original(file) BLOCK -%]
-L<F<[% file %]>|https://api.metacpan.org/source/BKB/[% info.name %]-[% info.version %]/originals/[% file %]>
+L<F<[% file %]>|https://fastapi.metacpan.org/source/BKB/[% info.name %]-[% info.version %]/originals/[% file %]>
 [%- END %]
 
 As required by the above licence, the original Awk script [%
@@ -171,6 +208,9 @@ Web browsers also may or may not be able to render these
 files. Currently Google Chrome seems to be the only browser with
 Shift-JIS capabilities.
 
+The original script may also be downloaded from
+L<http://www.vector.co.jp/soft/dos/personal/se016093.html>.
+
 =head1 AUTHOR
 
 Original Awk script by H. Takano. Perl conversion by N. Ueno. This
@@ -178,5 +218,3 @@ CPAN-ification of N. Ueno's Perl script was performed by Ben Bullock.
 
 For enquiries about this Perl module, please contact Ben Bullock
 <bkb@cpan.org>.
-
-

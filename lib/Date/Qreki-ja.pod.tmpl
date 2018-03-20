@@ -7,7 +7,7 @@
 
 [% INCLUDE $out | xtidy %]
 
-(この例はL<F<[% pl %]>|https://api.metacpan.org/source/BKB/[% info.name %]-[% info.version %]/examples/[% pl %]>としてディストロにある。)
+(この例はL<F<[% pl %]>|https://fastapi.metacpan.org/source/BKB/[% info.name %]-[% info.version %]/examples/[% pl %]>としてディストロにある。)
 [% END %]
 [%- MACRO since(version) BLOCK -%]
 この関数は[% version %]バーションから。
@@ -114,7 +114,7 @@ Date::Qreki - 新旧暦変換
 =head2 オリジナルのスクリプトと説明書
 
 [% MACRO original(file) BLOCK -%]
-L<F<[% file %]>|https://api.metacpan.org/source/BKB/[% info.name %]-[% info.version %]/originals/[% file %]>
+L<F<[% file %]>|https://fastapi.metacpan.org/source/BKB/[% info.name %]-[% info.version %]/originals/[% file %]>
 [%- END %]
 
 配布規定にしたがって、オリジナルのスクリプトは[% original("qreki.awk")
@@ -125,6 +125,8 @@ L<F<[% file %]>|https://api.metacpan.org/source/BKB/[% info.name %]-[% info.vers
     perl -MEncode -n -e "print encode_utf8 (decode ('CP932', \$_));" < originals/qreki.doc
 
 などでUTF-8に変換してください。
+
+L<http://www.vector.co.jp/soft/dos/personal/se016093.html>からもダウンロードできる。
 
 =head1 作者
 
