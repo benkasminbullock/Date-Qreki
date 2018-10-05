@@ -6,8 +6,7 @@
 produces output
 
 [% INCLUDE $out | xtidy %]
-
-(This example is included as L<F<[% pl %]>|https://fastapi.metacpan.org/source/BKB/[% info.pm %]-[% info.version %]/examples/[% pl %]> in the distribution.)
+(This example is included as L<F<[% pl %]>|https://fastapi.metacpan.org/source/BKB/[% info.name %]-[% info.version %]/examples/[% pl %]> in the distribution.)
 [% END %]
 [%- MACRO since(version) BLOCK -%]
 This function was added in version [% version %] of the module.
@@ -124,7 +123,8 @@ Older Japanese eras
 
 =item L<Lingua::JA::FindDates>
 
-Scan text to find dates in Japanese format.
+Scan text to find dates in Japanese format. This only does modern
+dates.
 
 =back
 
@@ -144,6 +144,11 @@ Modules related to phases of the moon include
 
 As of [% info.version %], I have not tested any of these modules
 against Date::Qreki.
+
+There are also some L<Islamic calendar modules on
+CPAN|https://metacpan.org/search?q=islamic+calendar> which
+might also be relevant, since the Islamic calendar also uses phases of
+the moon.
 
 =head1 COPYRIGHT
 

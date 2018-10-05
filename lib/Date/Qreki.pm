@@ -5,7 +5,7 @@ require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw/calc_kyureki get_rokuyou rokuyou_unicode check_24sekki/;
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 use utf8;
 
 #=========================================================================
@@ -44,9 +44,8 @@ sub get_rokuyou
 {
 
 	my ($year,$mon,$day) = @_;
-	my ($tm0,$q_year,$q_mon,$q_day,$uruu,$q_yaer);
 
-	($q_yaer,$uruu,$q_mon,$q_day) = calc_kyureki($year,$mon,$day);
+	my (undef,undef,$q_mon,$q_day) = calc_kyureki($year,$mon,$day);
 
 	return(($q_mon + $q_day) % 6);
 }
@@ -55,9 +54,8 @@ sub rokuyou_unicode
 {
 
 	my ($year,$mon,$day) = @_;
-	my ($tm0,$q_year,$q_mon,$q_day,$uruu,$q_yaer);
 
-	($q_yaer,$uruu,$q_mon,$q_day) = calc_kyureki($year,$mon,$day);
+	my (undef,undef,$q_mon,$q_day) = calc_kyureki($year,$mon,$day);
 
 	return (qw/大安 赤口 先勝 友引 先負 仏滅/)[(($q_mon + $q_day) % 6)];
 }
