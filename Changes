@@ -1,5 +1,9 @@
 Revision history for perl module Date::Qreki
 
+0.09 2018-11-17
+
+* 0.5 added to Julian date
+
 0.08 2018-10-05
 
 * Add synopsis section to documentation

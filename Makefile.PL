@@ -10,8 +10,8 @@ WriteMakefile (
     NAME => 'Date::Qreki',
     VERSION_FROM => $pm,
     ABSTRACT_FROM => $pod,
+    # Ben Bullock is not the author, this is for CPAN purposes.
     AUTHOR => 'Ben Bullock <bkb@cpan.org>',
-    LICENSE => 'perl',
     PREREQ_PM => {
     },
     META_MERGE => {

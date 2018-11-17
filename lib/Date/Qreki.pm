@@ -1,12 +1,12 @@
 package Date::Qreki;
 use warnings;
 use strict;
+use utf8;
 require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw/calc_kyureki get_rokuyou rokuyou_unicode check_24sekki/;
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
 our $VERSION = '0.08';
-use utf8;
 
 #=========================================================================
 # 旧暦計算サンプルプログラム  $Revision:   1.1  $
@@ -27,6 +27,14 @@ use utf8;
 use constant PI => 3.141592653589793238462;
 use constant k => PI/180.0;
 
+# Approximate Sidereal Time
+# http://aa.usno.navy.mil/faq/docs/GAST.php
+
+use constant jan1_2000 => 2451545.0;
+use constant japan => 9.0/24.0;
+
+# Cosine of angle in degrees, rather than radians.
+
 sub deg_cos
 {
     my ($angle) = @_;
@@ -43,21 +51,16 @@ sub deg_cos
 sub get_rokuyou
 {
 
-	my ($year,$mon,$day) = @_;
-
-	my (undef,undef,$q_mon,$q_day) = calc_kyureki($year,$mon,$day);
-
-	return(($q_mon + $q_day) % 6);
+    my ($year,$mon,$day) = @_;
+    my (undef,undef,$q_mon,$q_day) = calc_kyureki($year,$mon,$day);
+    return(($q_mon + $q_day) % 6);
 }
 
 sub rokuyou_unicode
 {
-
-	my ($year,$mon,$day) = @_;
-
-	my (undef,undef,$q_mon,$q_day) = calc_kyureki($year,$mon,$day);
-
-	return (qw/大安 赤口 先勝 友引 先負 仏滅/)[(($q_mon + $q_day) % 6)];
+    my ($year,$mon,$day) = @_;
+    my (undef,undef,$q_mon,$q_day) = calc_kyureki($year,$mon,$day);
+    return (qw/大安 赤口 先勝 友引 先負 仏滅/)[(($q_mon + $q_day) % 6)];
 }
 #=========================================================================
 # 新暦に対応する、旧暦を求める。
@@ -76,10 +79,9 @@ sub rokuyou_unicode
 #=========================================================================
 sub calc_kyureki
 {
-	my ($year,$mon,$day) = @_;
-	my (@kyureki,$tm,@saku,$lap,@a,$i,@m);
-
-	my $tm0 = YMDT2JD($year,$mon,$day,0,0,0);
+    my ($year, $mon, $day) = @_;
+    my (@kyureki, $tm, @saku, $lap, @a, $i, @m);
+    my $tm0 = YMDT2JD ($year,$mon,$day,0,0,0);
 
 #-----------------------------------------------------------------------
 # 計算対象の直前にあたる二分二至の時刻を求める
@@ -221,6 +223,8 @@ sub calc_kyureki
 
 }
 
+use constant century => 36525.0;
+
 #=========================================================================
 # 中気の時刻を求める
 # 
@@ -236,23 +240,20 @@ sub calc_chu
 	my ($tm) = @_;
 	my ($tm1,$tm2,$t,$rm_sun0,$rm_sun,$delta_t1,$delta_t2,$delta_rm);
 	my (@temp);
-#-----------------------------------------------------------------------
-#時刻引数を分解する
-#-----------------------------------------------------------------------
-	$tm1 = int( $tm );
-	$tm2 = $tm - $tm1;
+       $tm1 = int( $tm );
+       $tm2 = $tm - $tm1;
 
 #-----------------------------------------------------------------------
 # JST ==> DT （補正時刻=0.0sec と仮定して計算）
 #-----------------------------------------------------------------------
-	$tm2-=9.0/24.0;
+       $tm2-=9.0/24.0;
 
 #-----------------------------------------------------------------------
 # 中気の黄経 λsun0 を求める
 #-----------------------------------------------------------------------
-	$t=($tm2+0.5) / 36525.0;
-	$t=$t + ($tm1-2451545.0) / 36525.0;
-	$rm_sun = LONGITUDE_SUN( $t );
+       $t=($tm2+0.5) / century;
+       $t=$t + ($tm1 - jan1_2000) / century;
+       $rm_sun = LONGITUDE_SUN( $t );
 
 	$rm_sun0 = 30.0*int($rm_sun/30.0);
 
@@ -266,8 +267,8 @@ sub calc_chu
 #-----------------------------------------------------------------------
 # λsun を計算
 #-----------------------------------------------------------------------
-		$t =($tm2+0.5) / 36525.0;
-		$t =$t + ($tm1-2451545.0) / 36525.0;
+		$t =($tm2+0.5) / century;
+		$t =$t + ($tm1 - jan1_2000) / century;
 		$rm_sun=LONGITUDE_SUN( $t );
 
 #-----------------------------------------------------------------------
@@ -309,7 +310,7 @@ sub calc_chu
 # （補正時刻=0.0sec と仮定して計算）
 # chu[i,1]:黄経
 #-----------------------------------------------------------------------
-	$temp[0] = $tm2+9.0/24.0;
+	$temp[0] = $tm2+japan;
 	$temp[0] += $tm1;
 	$temp[1] = $rm_sun0;
 
@@ -339,13 +340,13 @@ sub before_nibun
 #-----------------------------------------------------------------------
 # JST ==> DT （補正時刻=0.0sec と仮定して計算）
 #-----------------------------------------------------------------------
-	$tm2-=9.0/24.0;
+	$tm2-=japan;
 
 #-----------------------------------------------------------------------
 # 直前の二分二至の黄経 λsun0 を求める
 #-----------------------------------------------------------------------
-	$t=($tm2+0.5) / 36525.0;
-	$t=$t + ($tm1-2451545.0) / 36525.0;
+	$t=($tm2+0.5) / century;
+	$t=$t + ($tm1 - jan1_2000) / century;
 	$rm_sun=LONGITUDE_SUN( $t );
 	$rm_sun0=90*int($rm_sun/90.0);
 
@@ -359,8 +360,8 @@ sub before_nibun
 #-----------------------------------------------------------------------
 # λsun を計算
 #-----------------------------------------------------------------------
-		$t=($tm2+0.5) / 36525.0;
-		$t=$t + ($tm1-2451545.0) / 36525.0;
+		$t=($tm2+0.5) / century;
+		$t=$t + ($tm1 - jan1_2000) / century;
 		$rm_sun=LONGITUDE_SUN( $t );
 
 #-----------------------------------------------------------------------
@@ -403,7 +404,7 @@ sub before_nibun
 # （補正時刻=0.0sec と仮定して計算）
 # nibun[0,1]:黄経
 #-----------------------------------------------------------------------
-	$nibun[0] = $tm2+9.0/24.0;
+	$nibun[0] = $tm2+japan;
 	$nibun[0] += $tm1;
 	$nibun[1] = $rm_sun0;
 
@@ -441,7 +442,7 @@ sub calc_saku
 #-----------------------------------------------------------------------
 # JST ==> DT （補正時刻=0.0sec と仮定して計算）
 #-----------------------------------------------------------------------
-	$tm2-=9.0/24.0;
+	$tm2-=japan;
 
 #-----------------------------------------------------------------------
 # 繰り返し計算によって朔の時刻を計算する
@@ -452,10 +453,10 @@ sub calc_saku
 
 #-----------------------------------------------------------------------
 # 太陽の黄経λsun ,月の黄経λmoon を計算
-# t = (tm - 2451548.0 + 0.5)/36525.0;
+# t = (tm - 2451548.0 + 0.5)/century;
 #-----------------------------------------------------------------------
-		$t=($tm2+0.5) / 36525.0;
-		$t=$t + ($tm1-2451545.0) / 36525.0;
+		$t=($tm2+0.5) / century;
+		$t=$t + ($tm1 - jan1_2000) / century;
 		$rm_sun=LONGITUDE_SUN( $t );
 		$rm_moon=LONGITUDE_MOON( $t );
 
@@ -528,28 +529,33 @@ sub calc_saku
 # （補正時刻=0.0sec と仮定して計算）
 #-----------------------------------------------------------------------
 
-	return($tm2+$tm1+9.0/24.0);
+	return($tm2+$tm1+japan);
 }
 
 #=========================================================================
 #  角度の正規化を行う。すなわち引数の範囲を ０≦θ＜３６０ にする。
 #=========================================================================
+
+# Given an angle of any value, turn it into an angle between 0 and 360
+# degrees.
+
 sub NORMALIZATION_ANGLE
 {
-	my ($angle) = @_;
-	my ($angle1,$angle2);
+    my ($angle) = @_;
+    my $angle1;
 
-	if( $angle < 0.0 ){
-		$angle1 = -$angle;
-		$angle2 = int( $angle1 / 360.0 );
-		$angle1 -= 360.0 * $angle2;
-		$angle1 = 360.0 - $angle1;
-	}else{
-		$angle1 = int( $angle / 360.0 );
-		$angle1 = $angle - 360.0 * $angle1;
-	}
+    if ( $angle < 0.0 ) {
+	$angle1 = -$angle;
+	my $angle2 = int ($angle1 / 360.0);
+	$angle1 -= 360.0 * $angle2;
+	$angle1 = 360.0 - $angle1;
+    }
+    else {
+	$angle1 = int ($angle / 360.0);
+	$angle1 = $angle - 360.0 * $angle1;
+    }
 
-	return($angle1);
+    return $angle1;
 }
 
 #=========================================================================
@@ -610,8 +616,8 @@ sub LONGITUDE_SUN
 #=========================================================================
 sub LONGITUDE_MOON
 {
-	my ($t) = @_;
-	my ($th,$ang);
+    my ($t) = @_;
+    my ($th,$ang);
 
 #-----------------------------------------------------------------------
 # 摂動項の計算
@@ -736,6 +742,13 @@ sub LONGITUDE_MOON
    $th = $th + .6583 * deg_cos ($ang );
   $ang = NORMALIZATION_ANGLE(  413335.35 * $t +  10.74 );
    $th = $th + 1.2740 * deg_cos ($ang );
+
+# The following big number turns up here:
+
+# https://github.com/basileh/pyGrav/blob/master/main_code/synthetic_tides.py
+
+# But that is cited to a paper from 2015, whereas this code dates from 1993.
+
   $ang = NORMALIZATION_ANGLE( 477198.868 * $t + 44.963 ); 
    $th = $th + 6.2888 * deg_cos ($ang );
 
@@ -755,32 +768,37 @@ sub LONGITUDE_MOON
 # ※ この関数では、グレゴリオ暦法による年月日から求めるものである。
 #    （ユリウス暦法による年月日から求める場合には使用できない。）
 #=========================================================================
+
+# Year, month, day to Julian day. This is the original Julian day
+# using 12h Jan 1, 4713 BC as the epoch.
+
 sub YMDT2JD
 {
-	my ($year,$month,$day,$hour,$min,$sec) = @_;
-	my ($jd,$t);
+    my ($year, $month, $day, $hour, $min, $sec) = @_;
 
-	if( $month < 3.0 ){
-		$year -= 1.0;
-		$month += 12.0;
-	}
+    if ( $month < 3.0 ) {
+	$year -= 1.0;
+	$month += 12.0;
+    }
 
-	$jd  = int( 365.25 * $year );
-	$jd += int( $year / 400.0 );
-	$jd -= int( $year / 100.0 );
-	$jd += int( 30.59 * ( $month-2.0 ) );
-	$jd += 1721088;
-	$jd += $day;
+    my $jd  = int( 365.25 * $year );
+    $jd += int( $year / 400.0 );
+    $jd -= int( $year / 100.0 );
+    $jd += int( 30.59 * ( $month-2.0 ) );
+    $jd += 1721088;
+    $jd += $day;
+    # Bring these calculations into line with the US naval observatory
+    # values.
+#    $jd += 0.5;
 
-	$t  = $sec / 3600.0;
-	$t += $min /60.0;
-	$t += $hour;
-	$t  = $t / 24.0;
+    my $t  = $sec / 3600.0;
+    $t += $min /60.0;
+    $t += $hour;
+    $t  = $t / 24.0;
 
-	$jd += $t;
+    $jd += $t;
 
-	return( $jd );
-
+    return $jd;
 }
 
 #=========================================================================
@@ -796,38 +814,60 @@ sub YMDT2JD
 sub JD2YMDT
 {
 
-	my ($JD) = @_;
-	my (@TIME,$x0,$x1,$x2,$x3,$x4,$x5,$x6,$tm);
+    my ($JD) = @_;
+    my (@TIME,$x0,$x1,$x2,$x3,$x4,$x5,$x6,$tm);
 
-	$x0 = int( $JD+68570.0);
-	$x1 = int( $x0/36524.25 );
-	$x2 = $x0 - int( 36524.25*$x1 + 0.75 );
-	$x3 = int( ( $x2+1 )/365.2425 );
-	$x4 = $x2 - int( 365.25*$x3 )+31.0;
-	$x5 = int( int($x4) / 30.59 );
-	$x6 = int( int($x5) / 11.0 );
+    $x0 = int( $JD+68570.0);
+    $x1 = int( $x0/36524.25 );
+    $x2 = $x0 - int( 36524.25*$x1 + 0.75 );
+    $x3 = int( ( $x2+1 )/365.2425 );
+    $x4 = $x2 - int( 365.25*$x3 )+31.0;
+    $x5 = int( int($x4) / 30.59 );
+    $x6 = int( int($x5) / 11.0 );
 
-	$TIME[2] = $x4 - int( 30.59*$x5 );
-	$TIME[1] = $x5 - 12*$x6 + 2;
-	$TIME[0] = 100*( $x1-49 ) + $x3 + $x6;
+    $TIME[2] = $x4 - int( 30.59*$x5 );
+    $TIME[1] = $x5 - 12*$x6 + 2;
+    $TIME[0] = 100*( $x1-49 ) + $x3 + $x6;
 
-# 2月30日の補正
-	if($TIME[1]==2 && $TIME[2] > 28){
-		if($TIME[0] % 100 == 0 && $TIME[0] % 400 == 0){
-			$TIME[2]=29;
-		}elsif($TIME[0] % 4 ==0){
-			$TIME[2]=29;
-		}else{
-			$TIME[2]=28;
-		}
+    # 2月30日の補正
+    if ($TIME[1]==2 && $TIME[2] > 28) {
+	if ($TIME[0] % 100 == 0 && $TIME[0] % 400 == 0) {
+	    $TIME[2]=29;
 	}
+	elsif ($TIME[0] % 4 ==0) {
+	    $TIME[2]=29;
+	}
+	else {
+	    $TIME[2]=28;
+	}
+    }
 
-	$tm=86400.0*( $JD - int( $JD ) );
-	$TIME[3] = int( $tm/3600.0 );
-	$TIME[4] = int( ($tm - 3600.0*$TIME[3])/60.0 );
-	$TIME[5] = int( $tm - 3600.0*$TIME[3] - 60*$TIME[4] );
+    $tm=86400.0*( $JD - int( $JD ) );
+    $TIME[3] = int( $tm/3600.0 );
+    $TIME[4] = int( ($tm - 3600.0*$TIME[3])/60.0 );
+    $TIME[5] = int( $tm - 3600.0*$TIME[3] - 60*$TIME[4] );
 
-	return(@TIME);
+    return @TIME;
+}
+
+sub d
+{
+    my ($tm) = @_;
+#-----------------------------------------------------------------------
+#時刻引数を分解する
+#-----------------------------------------------------------------------
+    my $tm1 = int( $tm );
+    my $tm2 = $tm - $tm1;
+#-----------------------------------------------------------------------
+# JST ==> DT （補正時刻=0.0sec と仮定して計算）
+#-----------------------------------------------------------------------
+    $tm2 -= japan;
+#-----------------------------------------------------------------------
+# 中気の黄経 λsun0 を求める
+#-----------------------------------------------------------------------
+    my $t = ($tm2 + 0.5) / century;
+    $t = $t + ($tm1 - jan1_2000) / century;
+    return LONGITUDE_SUN ($t);
 }
 
 #=========================================================================
@@ -838,50 +878,41 @@ sub JD2YMDT
 # 戻り値 .... ２４節気の名称
 #
 #=========================================================================
+
+my @sekki24 = qw!春分 清明 穀雨 立夏 小満 芒種 夏至 小暑 大暑 立秋 処暑 白露
+		 秋分 寒露 霜降 立冬 小雪 大雪 冬至 小寒 大寒 立春 雨水 啓蟄!;
+
 sub check_24sekki
 {
-	my ($year,$mon,$day) = @_;
-	my ($tm1,$tm2,$t,$rm_sun_today,$rm_sun_today0,$rm_sun_tommorow,$rm_sun_tommorow0);
+    my ($year,$mon,$day) = @_;
 
 #-----------------------------------------------------------------------
 # ２４節気の定義
 #-----------------------------------------------------------------------
-	my (@sekki24) = ("春分","清明","穀雨","立夏","小満","芒種","夏至","小暑","大暑","立秋","処暑","白露",
-	                   "秋分","寒露","霜降","立冬","小雪","大雪","冬至","小寒","大寒","立春","雨水","啓蟄");
 
-	my $tm = YMDT2JD($year,$mon,$day,0,0,0);
+    my $tm = YMDT2JD ($year,$mon,$day,0,0,0);
 
 #-----------------------------------------------------------------------
 #時刻引数を分解する
 #-----------------------------------------------------------------------
-	$tm1 = int( $tm );
-	$tm2 = $tm - $tm1;
-	$tm2-=9.0/24.0;
-	$t=($tm2+0.5) / 36525.0;
-	$t=$t + ($tm1-2451545.0) / 36525.0;
 
-	#今日の太陽の黄経
-	$rm_sun_today = LONGITUDE_SUN( $t );
+    #今日の太陽の黄経
+    my $rm_sun_today = d ($tm);
 
-	$tm++;
-	$tm1 = int($tm);
-	$tm2 = $tm - $tm1;
-	$tm2-=9.0/24.0;
-	$t=($tm2+0.5) / 36525.0;
-	$t=$t + ($tm1-2451545.0) / 36525.0;
+    $tm++;
 
-	#明日の太陽の黄経
-	$rm_sun_tommorow = LONGITUDE_SUN($t);
+    #明日の太陽の黄経
+    my $rm_sun_tomorrow = d ($tm);
 
-	#
-	$rm_sun_today0   = 15.0 * int($rm_sun_today / 15.0);
-	$rm_sun_tommorow0 = 15.0 * int($rm_sun_tommorow / 15.0);
+    my $rm_sun_today0   = int ($rm_sun_today / 15.0);
+    my $rm_sun_tomorrow0 = int ($rm_sun_tomorrow / 15.0);
 
-	if($rm_sun_today0 != $rm_sun_tommorow0){
-		return($sekki24[$rm_sun_tommorow0 / 15]);
-	}else{
-		return('');
-	}
+    if ($rm_sun_today0 != $rm_sun_tomorrow0) {
+	return $sekki24[$rm_sun_tomorrow0];
+    }
+    else {
+	return '';
+    }
 }
 
 1;
