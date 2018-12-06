@@ -14,9 +14,9 @@ use Date::Qreki;
 
 # Test documentation claims
 
-cmp_ok (Date::Qreki::NORMALIZATION_ANGLE (360.0), '==', 0.0);
-cmp_ok (Date::Qreki::NORMALIZATION_ANGLE (0.0), '==', 0.0);
-cmp_ok (Date::Qreki::NORMALIZATION_ANGLE (180.0), '==', 180.0);
-cmp_ok (Date::Qreki::NORMALIZATION_ANGLE (540.0), '==', 180.0);
+cmp_ok (Date::Qreki::nangle (360.0), '==', 0.0);
+cmp_ok (Date::Qreki::nangle (0.0), '==', 0.0);
+cmp_ok (Date::Qreki::nangle (180.0), '==', 180.0);
+cmp_ok (Date::Qreki::nangle (540.0), '==', 180.0);
 
 done_testing ();
