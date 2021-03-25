@@ -26,4 +26,5 @@ my $sun = Astro::Coord::ECI::Sun->new (station => $station);
 $sun->universal ($time1);
 my ($azim, $elev, $range) = $sun->azel ();
 print rad2deg ($azim), "\n";
+ok (1);
 done_testing ();
